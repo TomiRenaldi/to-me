@@ -1,0 +1,22 @@
+*
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body
+{
+    font-family: 'Inter var', sans-serif;
+    overflow: hidden;
+    background: black;
+    user-select: none;
+}
+
+.root
+{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+}
