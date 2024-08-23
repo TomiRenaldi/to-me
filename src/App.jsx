@@ -5,20 +5,16 @@ import { Reflector, Text, useTexture } from "@react-three/drei";
 
 export default function App() {
   return (
-    <Canvas
-      gl={{ alpha: false }}
-      dpr={[1, 1.5]}
-      camera={{ position: [0, 3, 100], fov: 15 }}
-    >
-      <color attach="background" args={["black"]} />
-      <fog attach="fog" args={["black", 15, 20]} />
+    <Canvas gl={{ alpha: false }} dpr={[1, 1.5]} camera={{ position: [0, 3, 100], fov: 15 }}>
+      <color attach="background" args={['black']} />
+      <fog attach="fog" args={['black', 15, 20]} />
       <Suspense fallback={null}>
-        <group position={[0, -1, 0]}>
-          <VideoText position={[0, 1.3, -2]} />
+        <group position={[0, -0.9, 0]}>
+          <VideoText position={[0, 1, -2]} />
           <Ground />
         </group>
         <ambientLight intensity={0.5} />
-        <spotLight position={[0, 10, 0]} intensity={0.3} />
+        <spotLight position={[0, 13, 0]} intensity={0.3} />
         <directionalLight position={[-50, 0, -40]} intensity={0.7} />
         <Intro />
       </Suspense>
@@ -29,7 +25,7 @@ export default function App() {
 function VideoText(props) {
   const [video] = useState(() =>
     Object.assign(document.createElement("video"), {
-      src: "/ketenangan.mp4",
+      src: "/ward.mp4",
       crossOrigin: "Anonymous",
       loop: true,
       muted: true,
@@ -37,8 +33,8 @@ function VideoText(props) {
   );
   useEffect(() => void video.play(), [video]);
   return (
-    <Text font="/Inter-Bold.woff" fontSize={3} letterSpacing={-0.06} {...props}>
-      drei
+    <Text font="/Inter-Bold.woff" fontSize={2} letterSpacing={-0.08} {...props}>
+      to-me.
       <meshBasicMaterial toneMapped={false}>
         <videoTexture
           attach="map"
@@ -57,7 +53,7 @@ function Ground() {
   ]);
   return (
     <Reflector
-      blur={[400, 100]}
+      blur={[300, 100]}
       resolution={512}
       args={[10, 10]}
       mirror={0.5}
@@ -71,7 +67,7 @@ function Ground() {
           metalness={0.4}
           roughnessMap={floor}
           normalMap={normal}
-          normalScale={[2, 2]}
+          normalScale={[4, 4]}
           {...props}
         />
       )}
