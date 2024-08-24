@@ -1,28 +1,43 @@
 import * as THREE from "three";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState, forwardRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Reflector, Text, useTexture } from "@react-three/drei";
+import { Text, useTexture, MeshReflectorMaterial } from "@react-three/drei";
+import { EffectComposer, GodRays, Bloom } from "@react-three/postprocessing";
 
 export default function App() {
   return (
-    <Canvas gl={{ alpha: false }} dpr={[1, 1.5]} camera={{ position: [0, 3, 100], fov: 15 }}>
-      <color attach="background" args={['black']} />
-      <fog attach="fog" args={['black', 15, 20]} />
+    <Canvas
+      shadows
+      gl={{ alpha: false }}
+      dpr={[1, 1.5]}
+      camera={{ position: [0, 3, 100], fov: 15 }}
+    >
+      <color attach="background" args={["black"]} />
+      <fog attach="fog" args={["black", 15, 20]} />
       <Suspense fallback={null}>
-        <group position={[0, -0.9, 0]}>
-          <VideoText position={[0, 1, -2]} />
-          <Ground />
-        </group>
+        <TextScreen />
         <ambientLight intensity={0.5} />
-        <spotLight position={[0, 13, 0]} intensity={0.3} />
-        <directionalLight position={[-50, 0, -40]} intensity={0.7} />
+        <mesh position={[0, -0.8, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[20, 20]} />
+          <MeshReflectorMaterial
+            blur={[400, 100]}
+            resolution={512}
+            mixBlur={1}
+            depthScale={1}
+            mixStrength={15}
+            rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+            minDepthThreshold={0.85}
+            metalness={0.9}
+            roughness={0.9}
+          />
+        </mesh>
         <Intro />
       </Suspense>
     </Canvas>
   );
 }
 
-function VideoText(props) {
+const Emitter = forwardRef((props, forwardRef) => {
   const [video] = useState(() =>
     Object.assign(document.createElement("video"), {
       src: "/ward.mp4",
@@ -33,8 +48,14 @@ function VideoText(props) {
   );
   useEffect(() => void video.play(), [video]);
   return (
-    <Text font="/Inter-Bold.woff" fontSize={2} letterSpacing={-0.08} {...props}>
-      to-me.
+    <Text
+      ref={forwardRef}
+      font="/Inter-Bold.woff"
+      fontSize={2}
+      letterSpacing={-0.06}
+      {...props}
+    >
+      to-me
       <meshBasicMaterial toneMapped={false}>
         <videoTexture
           attach="map"
@@ -44,34 +65,25 @@ function VideoText(props) {
       </meshBasicMaterial>
     </Text>
   );
-}
+});
 
-function Ground() {
-  const [floor, normal] = useTexture([
-    "/SurfaceImperfections003_1K_var1.jpg",
-    "/SurfaceImperfections003_1K_Normal.jpg",
-  ]);
+function TextScreen() {
+  const [material, set] = useState();
   return (
-    <Reflector
-      blur={[300, 100]}
-      resolution={512}
-      args={[10, 10]}
-      mirror={0.5}
-      mixBlur={6}
-      mixStrength={1.5}
-      rotation={[-Math.PI / 2, 0, Math.PI / 2]}
-    >
-      {(Material, props) => (
-        <Material
-          color="#a0a0a0"
-          metalness={0.4}
-          roughnessMap={floor}
-          normalMap={normal}
-          normalScale={[4, 4]}
-          {...props}
-        />
+    <>
+      <Emitter ref={set} />
+      {material && (
+        <EffectComposer disableNormalPass multisampling={8}>
+          <GodRays sun={material} exposure={0.05} decay={0.9} blur />
+          <Bloom
+            luminanceThreshold={0}
+            mipmapBlur
+            luminanceSmoothing={0.0}
+            intensity={1}
+          />
+        </EffectComposer>
       )}
-    </Reflector>
+    </>
   );
 }
 
