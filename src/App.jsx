@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import React, { Suspense, useEffect, useState, forwardRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Text, useTexture, MeshReflectorMaterial } from "@react-three/drei";
+import { Text, MeshReflectorMaterial } from "@react-three/drei";
 import { EffectComposer, GodRays, Bloom } from "@react-three/postprocessing";
 
 export default function App() {
@@ -18,7 +18,7 @@ export default function App() {
         <TextScreen />
         <ambientLight intensity={0.5} />
         <mesh position={[0, -0.8, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[20, 20]} />
+          <planeGeometry args={[15, 25]} />
           <MeshReflectorMaterial
             blur={[400, 100]}
             resolution={512}
